@@ -1,0 +1,21 @@
+{
+  "name": "aws-node-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Cristian Colorado",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.0.1",
+    "axios": "^0.19.0",
+    "body-parser": "~1.0.1",
+    "cheerio": "^1.0.0-rc.3",
+    "ejs": "^1.0.0",
+    "express": "^4.6.1",
+    "jszip": "^3.2.1"
+  }
+}
