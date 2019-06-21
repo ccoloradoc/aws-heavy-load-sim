@@ -11,6 +11,9 @@ const JSZip = require("jszip");
 const CONTENT_FOLDER = './public/content';
 const METADATA_HOST = process.env.NODE_ENV && process.env.NODE_ENV == 'production' ? 'http://169.254.169.254' : 'http://localhost:9090/api';
 
+cosole.log('>> NODE_ENV: ' + process.env.NODE_ENV);
+cosole.log('>> METADATA_HOST: ' + METADATA_HOST);
+
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
