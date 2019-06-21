@@ -30,6 +30,15 @@ function stats(fileName, callback) {
   });
 }
 
+function formatDate(date, separator) {
+  return date.getFullYear() + separator + 
+        (date.getMonth() + 1) + separator + 
+        date.getDate() + separator + 
+        date.getHours() + separator + 
+        date.getMinutes() + separator + 
+        date.getSeconds();
+}
+
 // index page 
 app.get('/', function(req, res) {
     async.map(['public-ipv4', 'instance-id'], function(metaData, callback) {
@@ -64,11 +73,12 @@ router.get('/list', function(req, res) {
 
 router.get('/process', function(req, res) {
   let current_datetime = new Date();
-  let formatted_date = current_datetime.getFullYear() + "_" + (current_datetime.getMonth() + 1) + "_" + current_datetime.getDate() + "_" + current_datetime.getHours() + "_" + current_datetime.getMinutes() + "_" + current_datetime.getSeconds();
-  let buffer = Buffer.allocUnsafe(1500000000);
+  let formatted_date = formatDate(current_datetime, "_");
+  let buffer = Buffer.allocUnsafe(1800000000);
+  
+  console.log('>> File: ' + formatted_date + '.zip started at ' + formatted_date);
   
   var zip = new JSZip();
-  
   // Add a top-level, arbitrary text file with contents
   zip.file("random.txt", buffer);
    
@@ -79,12 +89,24 @@ router.get('/process', function(req, res) {
          // JSZip generates a readable stream with a "end" event,
          // but is piped here in a writable stream which emits a "finish" event.
          let end_datetime = new Date();
+         let formatted_end_date = formatDate(end_datetime, "-");
+         
+         console.log('>> File: ' + formatted_date + '.zip completed at ' + formatted_end_date);
          res.json({ 
+           name: formatted_date + '.zip', 
            start: current_datetime,
            end: end_datetime,
            msg: 'Success' 
          });
       });
+});
+
+router.get('/exist/:fileName', function() {
+  let path = CONTENT_FOLDER + '/' + req.params.fileName;
+  res.json({
+    file: req.params.fileName,
+    exist: fs.existsSync(path)
+  });
 });
 
 app.use('/api', router);
