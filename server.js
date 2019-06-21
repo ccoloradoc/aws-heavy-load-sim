@@ -10,9 +10,11 @@ const JSZip = require("jszip");
 
 const CONTENT_FOLDER = './public/content';
 const METADATA_HOST = process.env.NODE_ENV && process.env.NODE_ENV == 'production' ? 'http://169.254.169.254' : 'http://localhost:9090/api';
+const FILE_SIZE = parseInt(process.env.FILE_SIZE);
 
 console.log('>> NODE_ENV: ' + process.env.NODE_ENV);
 console.log('>> METADATA_HOST: ' + METADATA_HOST);
+console.log('>> FILE_SIZE: ' + process.env.FILE_SIZE + ' ' + typeof process.env.FILE_SIZE);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -77,7 +79,7 @@ router.get('/list', function(req, res) {
 router.get('/process', function(req, res) {
   let current_datetime = new Date();
   let formatted_date = formatDate(current_datetime, "_");
-  let buffer = Buffer.allocUnsafe(1800000000);
+  let buffer = Buffer.allocUnsafe(FILE_SIZE);
   
   console.log('>> File: ' + formatted_date + '.zip started at ' + formatted_date);
   
