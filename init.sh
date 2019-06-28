@@ -9,4 +9,4 @@ cd aws-heavy-load-sim
 mkdir public/content
 npm install
 npm install pm2@latest -g
-pm2 start ecosystem.config.js --env production
+pm2 reload ecosystem.config.js --env production

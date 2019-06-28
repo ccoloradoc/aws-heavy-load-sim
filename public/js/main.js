@@ -23,15 +23,16 @@ function updateContentTable() {
       row.appendChild(createCell(item.stats.size/10000000));
       body.appendChild(row);
     });
-    document.querySelector(".overlay").className = "overlay d-none";
+    document.querySelector("#overlay").className = "overlay d-none";
   });
 }
 
 document.querySelector("#process").onclick = function(evt) {
   evt.preventDefault();
     
-  document.querySelector(".overlay").className = "overlay";
-  fetch('/api/process', {
+  document.querySelector("#overlay").className = "overlay";
+  let value = document.querySelector("#number").value;
+  fetch('/api/process?number=' + (value || 10), {
     method: 'GET'
   }).then(function(response) {
     if(response.status == 200) {
