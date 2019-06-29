@@ -7,6 +7,7 @@ const async = require('async');
 const axios = require('axios');
 const fs = require('fs');
 const moment = require('moment');
+const cmd = require('node-cmd');
 const JSZip = require("jszip");
 
 const CONTENT_FOLDER = './public/content';
@@ -15,7 +16,7 @@ const FILE_SIZE = parseInt(process.env.FILE_SIZE || 100 * 1000000);
 
 console.log('>> NODE_ENV: ' + process.env.NODE_ENV);
 console.log('>> METADATA_HOST: ' + METADATA_HOST);
-console.log('>> FILE_SIZE: ' + process.env.FILE_SIZE + ' ' + typeof process.env.FILE_SIZE);
+console.log('>> FILE_SIZE: ' + FILE_SIZE);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -42,7 +43,8 @@ function formatDate(date, separator) {
         date.getDate() + separator + 
         date.getHours() + separator + 
         date.getMinutes() + separator + 
-        date.getSeconds();
+        date.getSeconds() + separator + 
+        date.getMilliseconds();
 }
 
 // index page 
@@ -77,10 +79,26 @@ router.get('/list', function(req, res) {
   });
 });
 
+router.get('/status', function(req, res) {
+  cmd.get('vmstat 1 2 | awk \'{ for (i=1; i<=NF; i++) if ($i=="id") { getline; getline; print $i }}\'', function(err, data, stderr){
+    console.log('>> return: ', data);
+    res.json({ cpu: data });
+  });
+});
+
+router.get('/hit', function(req, res) {
+  cmd.get('dd if=/dev/zero bs=100M count=100 | gzip | gzip -d  > /dev/null &', function(err, data, stderr){
+    console.log('>> return: ', data);
+    res.json({ cpu: data });
+  });
+});
+
+
 router.get('/process', function(req, res) {
   let number = req.query.number || 1;
   let startDate = moment();
   let formatted_date = formatDate(new Date(), "_");
+  let fileName = `${CONTENT_FOLDER}/${formatted_date}.zip`;
   let buffer = Buffer.allocUnsafe(FILE_SIZE);
   
   console.log(`>> File : ${formatted_date}.zip with ${number} of files`);
@@ -93,14 +111,14 @@ router.get('/process', function(req, res) {
    
   // JSZip can generate Buffers so you can do the following
   zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
-     .pipe(fs.createWriteStream(`${CONTENT_FOLDER}/${formatted_date}.zip`))
+     .pipe(fs.createWriteStream(fileName))
      .on('finish', function () {
          // JSZip generates a readable stream with a "end" event,
          // but is piped here in a writable stream which emits a "finish" event.
          let endDate = moment();
          console.log(`>> Stats: ${startDate.format("h:mm:ss:SSS a")} - ${endDate.format("h:mm:ss:SSS a")} = ${endDate.diff(startDate, 'seconds')} ms`);
          
-         fs.unlink(`${CONTENT_FOLDER}/${formatted_date}.zip`, (err) => {
+         fs.unlink(fileName, (err) => {
           if (err) {
             console.error(err);
           } else {
