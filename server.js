@@ -65,6 +65,24 @@ app.get('/', function(req, res) {
 
 var router = express.Router(); 
 
+/* Command line implementation */
+router.get('/status', function(req, res) {
+  cmd.get('vmstat 1 2 | awk \'{ for (i=1; i<=NF; i++) if ($i=="id") { getline; getline; print $i }}\'', function(err, data, stderr){
+    console.log(`>> vmstat: ${parseInt(data)}`);
+    res.json({ cpu: 100 - parseInt(data) });
+  });
+});
+
+router.get('/hit', function(req, res) {
+  let startDate = moment();
+  cmd.get('dd if=/dev/zero bs=100M count=100 | gzip | gzip -d  > /dev/null &', function(err, data, stderr){
+    let endDate = moment();
+    console.log(`>> DD: ${endDate.diff(startDate, 'seconds')} s  [${startDate.format("h:mm:ss:SSS a")} - ${endDate.format("h:mm:ss:SSS a")}]`);
+    res.json({ response: data });
+  });
+});
+
+/* First Implementation */
 router.get('/list', function(req, res) {
   // Read content folder 
   fs.readdir(CONTENT_FOLDER, function(err, items) {
@@ -78,21 +96,6 @@ router.get('/list', function(req, res) {
   
   });
 });
-
-router.get('/status', function(req, res) {
-  cmd.get('vmstat 1 2 | awk \'{ for (i=1; i<=NF; i++) if ($i=="id") { getline; getline; print $i }}\'', function(err, data, stderr){
-    console.log('>> return: ', data);
-    res.json({ cpu: data });
-  });
-});
-
-router.get('/hit', function(req, res) {
-  cmd.get('dd if=/dev/zero bs=100M count=100 | gzip | gzip -d  > /dev/null &', function(err, data, stderr){
-    console.log('>> return: ', data);
-    res.json({ cpu: data });
-  });
-});
-
 
 router.get('/process', function(req, res) {
   let number = req.query.number || 1;
