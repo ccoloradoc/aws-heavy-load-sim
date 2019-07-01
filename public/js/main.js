@@ -8,20 +8,28 @@ function cleanContentTable() {
   document.querySelector(".table .body").innerText = "";
 }
 
-function updateContentTable() {
-  fetch('/api/list', {
-    method: 'GET'
-  }).then(function(response) {
+function parseJson(response) {
+  if(response.status == 200) {
     return response.json()
-  }).then(function(items) {
+  }
+}
+
+function fetchStatus() {
+    return fetch('/api/status', {
+      method: 'GET'
+    }).then(parseJson);
+}
+
+function updateContentTable() {
+  fetchStatus().then(function(data) {
     cleanContentTable();
     var body = document.querySelector(".table .body");
-    items.forEach(function(item, index) {
-      var row = document.createElement('tr');
-      row.appendChild(createCell(index + 1));
-      row.appendChild(createCell(item.file));
-      row.appendChild(createCell(item.stats.size/10000000));
-      body.appendChild(row);
+    Object.keys(processes)
+      .forEach(function(item, index) {
+        var row = document.createElement('tr');
+        row.appendChild(createCell(index + 1));
+        row.appendChild(createCell(item));
+        body.appendChild(row);        
     });
     document.querySelector("#overlay").className = "overlay d-none";
   });
@@ -29,10 +37,8 @@ function updateContentTable() {
 
 document.querySelector("#process").onclick = function(evt) {
   evt.preventDefault();
-    
-  document.querySelector("#overlay").className = "overlay";
-  let value = document.querySelector("#number").value;
-  fetch('/api/process?number=' + (value || 10), {
+  
+  fetch('/api/hit', {
     method: 'GET'
   }).then(function(response) {
     if(response.status == 200) {
@@ -41,4 +47,11 @@ document.querySelector("#process").onclick = function(evt) {
   });
 }
 
-updateContentTable();
+cleanContentTable();
+
+setInterval(function(){ 
+  updateContentTable();
+}, 60 * 1000);
+
+
+
