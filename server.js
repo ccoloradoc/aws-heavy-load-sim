@@ -64,20 +64,27 @@ app.get('/', function(req, res) {
 });
 
 var router = express.Router(); 
+var processes = {};
 
 /* Command line implementation */
 router.get('/status', function(req, res) {
   cmd.get('vmstat 1 2 | awk \'{ for (i=1; i<=NF; i++) if ($i=="id") { getline; getline; print $i }}\'', function(err, data, stderr){
     console.log(`>> vmstat: ${parseInt(data)}`);
-    res.json({ cpu: 100 - parseInt(data) });
+    res.json({ 
+      cpu: 100 - parseInt(data),
+      processes: processes
+    });
   });
 });
 
 router.get('/hit', function(req, res) {
   let startDate = moment();
+  console.log(`<< DD: ${startDate.format("h:mm:ss:SSS a")}`);
+  processes[startDate.format("h:mm:ss:SSS a")] = true;
   cmd.get('dd if=/dev/zero bs=100M count=100 | gzip | gzip -d  > /dev/null &', function(err, data, stderr){
     let endDate = moment();
     console.log(`>> DD: ${endDate.diff(startDate, 'seconds')} s  [${startDate.format("h:mm:ss:SSS a")} - ${endDate.format("h:mm:ss:SSS a")}]`);
+    delete processes[startDate.format("h:mm:ss:SSS a")];
     res.json({ response: data });
   });
 });
