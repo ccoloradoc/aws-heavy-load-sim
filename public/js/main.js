@@ -24,11 +24,12 @@ function updateContentTable() {
   fetchStatus().then(function(data) {
     cleanContentTable();
     var body = document.querySelector(".table .body");
-    Object.keys(processes)
+    Object.keys(data.processes)
       .forEach(function(item, index) {
         var row = document.createElement('tr');
         row.appendChild(createCell(index + 1));
         row.appendChild(createCell(item));
+        row.appendChild(createCell(data.cpu));
         body.appendChild(row);        
     });
     document.querySelector("#overlay").className = "overlay d-none";
