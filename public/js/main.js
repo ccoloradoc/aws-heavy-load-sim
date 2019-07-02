@@ -27,7 +27,6 @@ function updateContentTable() {
     Object.keys(data.processes)
       .forEach(function(item, index) {
         var row = document.createElement('tr');
-        row.appendChild(createCell(index + 1));
         row.appendChild(createCell(item));
         row.appendChild(createCell(data.cpu));
         row.appendChild(createCell(data.ip));
@@ -50,11 +49,9 @@ document.querySelector("#process").onclick = function(evt) {
   });
 }
 
-cleanContentTable();
-
 setInterval(function(){ 
   updateContentTable();
-}, 60 * 1000);
+}, 20 * 1000);
 
 
 

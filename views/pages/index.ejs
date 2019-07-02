@@ -29,7 +29,6 @@
       <table class="table striped">
         <thead>
           <tr>
-            <th>Number</th>
             <th>Name</th>
             <th>CPU</th>
             <th>IP</th>
@@ -39,7 +38,6 @@
         <tbody class="body">
           <% Object.keys(processes).forEach(function(item, index) {  %>
               <tr>
-                <td><%= index + 1 %></td>
                 <td><%= item %></td>
                 <td></td>
                 <td><%= ip %></td>
