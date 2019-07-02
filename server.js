@@ -61,17 +61,18 @@ async.map(['public-ipv4', 'instance-id'], function(metaData, callback) {
   instance = results[1];
 });
 
+var processes = {};
 
 // index page 
 app.get('/', function(req, res) {
   res.render('pages/index', {
     ip: ip,
-    instance: instance
+    instance: instance,
+    processes: processes
   });
 });
 
 var router = express.Router(); 
-var processes = {};
 
 /* Command line implementation */
 router.get('/status', function(req, res) {
@@ -102,71 +103,7 @@ router.get('/hit', function(req, res) {
    });
 });
 
-/* First Implementation */
-router.get('/list', function(req, res) {
-  // Read content folder 
-  fs.readdir(CONTENT_FOLDER, function(err, items) {
-    if(err) res.json({ items: []});
-    // Read stats of each file
-    async.map(items, function(filePath, callback) {
-      stats(CONTENT_FOLDER + '/' + filePath, callback)
-    }, function(err, result) {
-      res.json(result);
-    });
-  
-  });
-});
-
-router.get('/process', function(req, res) {
-  let number = req.query.number || 1;
-  let startDate = moment();
-  let formatted_date = formatDate(new Date(), "_");
-  let fileName = `${CONTENT_FOLDER}/${formatted_date}.zip`;
-  let buffer = Buffer.allocUnsafe(FILE_SIZE);
-  
-  console.log(`>> File : ${formatted_date}.zip with ${number} of files`);
-  console.log('>> File: ' + formatted_date + '.zip started at ' + startDate.format("h:mm:ss:SSS a"));
-  
-  var zip = new JSZip();
-  // Add a top-level, arbitrary text file with contents
-  while(number--)
-    zip.file(`random${number}.txt`, buffer);
-   
-  // JSZip can generate Buffers so you can do the following
-  zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
-     .pipe(fs.createWriteStream(fileName))
-     .on('finish', function () {
-         // JSZip generates a readable stream with a "end" event,
-         // but is piped here in a writable stream which emits a "finish" event.
-         let endDate = moment();
-         console.log(`>> Stats: ${startDate.format("h:mm:ss:SSS a")} - ${endDate.format("h:mm:ss:SSS a")} = ${endDate.diff(startDate, 'seconds')} ms`);
-         
-         fs.unlink(fileName, (err) => {
-          if (err) {
-            console.error(err);
-          } else {
-            fs.writeFile(`${CONTENT_FOLDER}/${formatted_date}.txt`, "Hey there!", function(err) {
-              res.json({ 
-                name: formatted_date + '.zip', 
-                time: endDate.diff(startDate, 'milliseconds'),
-                msg: 'Success' 
-              });      
-            }); 
-          }
-         });
-        
-      });
-});
-
-router.get('/exist/:fileName', function() {
-  let path = CONTENT_FOLDER + '/' + req.params.fileName;
-  res.json({
-    file: req.params.fileName,
-    exist: fs.existsSync(path)
-  });
-});
-
 app.use('/api', router);
 
-app.listen(80);
+app.listen(90);
 console.log('80 is the magic port');

@@ -37,7 +37,15 @@
           </tr>
         </thead>
         <tbody class="body">
-          
+          <% Object.keys(processes).forEach(function(item, index) {  %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td><%= item %></td>
+                <td></td>
+                <td><%= ip %></td>
+                <td><%= instance %></td>
+              </tr>
+          <% }) %>
         </tbody>
       </table>  
     </div>
