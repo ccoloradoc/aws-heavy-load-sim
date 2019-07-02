@@ -47,20 +47,27 @@ function formatDate(date, separator) {
         date.getMilliseconds();
 }
 
+var ip, instance;
+
+/* Find instance details */
+async.map(['public-ipv4', 'instance-id'], function(metaData, callback) {
+  axios.get(METADATA_HOST + '/latest/meta-data/' + metaData)
+  .then(function(response) {
+      callback(null, response.data)
+  });
+}, function(err, results) {
+  console.log(results);
+  ip = results[0];
+  instance = results[1];
+});
+
+
 // index page 
 app.get('/', function(req, res) {
-    async.map(['public-ipv4', 'instance-id'], function(metaData, callback) {
-      axios.get(METADATA_HOST + '/latest/meta-data/' + metaData)
-      .then(function(response) {
-          callback(null, response.data)
-      });
-    }, function(err, results) {
-      console.log(results)
-      res.render('pages/index', {
-        ip: results[0],
-        instance: results[1]
-      });
-    });
+  res.render('pages/index', {
+    ip: ip,
+    instance: instance
+  });
 });
 
 var router = express.Router(); 
@@ -72,6 +79,8 @@ router.get('/status', function(req, res) {
     console.log(`>> vmstat: ${parseInt(data)}`);
     res.json({ 
       cpu: 100 - parseInt(data),
+      ip: ip,
+      instance: instance,
       processes: processes
     });
   });
@@ -85,8 +94,12 @@ router.get('/hit', function(req, res) {
     let endDate = moment();
     console.log(`>> DD: ${endDate.diff(startDate, 'seconds')} s  [${startDate.format("h:mm:ss:SSS a")} - ${endDate.format("h:mm:ss:SSS a")}]`);
     delete processes[startDate.format("h:mm:ss:SSS a")];
-    res.json({ response: data });
   });
+  res.json({ 
+    ip: ip,
+    instance: instance,
+    processes: processes
+   });
 });
 
 /* First Implementation */

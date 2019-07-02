@@ -19,8 +19,8 @@ mkdir public/content
 npm install
 # install pm2 
 npm install pm2@latest -g
-pm2 startup
 pm2 reload ecosystem.config.js --env production
+pm2 startup
 pm2 save
 # Log install paths
 whereis git

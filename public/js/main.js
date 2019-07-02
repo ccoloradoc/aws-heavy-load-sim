@@ -30,6 +30,8 @@ function updateContentTable() {
         row.appendChild(createCell(index + 1));
         row.appendChild(createCell(item));
         row.appendChild(createCell(data.cpu));
+        row.appendChild(createCell(data.ip));
+        row.appendChild(createCell(data.instance));
         body.appendChild(row);        
     });
     document.querySelector("#overlay").className = "overlay d-none";
