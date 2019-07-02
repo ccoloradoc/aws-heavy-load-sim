@@ -12,6 +12,7 @@ const JSZip = require("jszip");
 
 const CONTENT_FOLDER = './public/content';
 const METADATA_HOST = process.env.NODE_ENV && process.env.NODE_ENV == 'production' ? 'http://169.254.169.254' : 'http://localhost:9090/api';
+const PORT = process.env.NODE_ENV && process.env.NODE_ENV == 'production' ? '80' : '90';
 const FILE_SIZE = parseInt(process.env.FILE_SIZE || 100 * 1000000);
 
 console.log('>> NODE_ENV: ' + process.env.NODE_ENV);
@@ -105,5 +106,5 @@ router.get('/hit', function(req, res) {
 
 app.use('/api', router);
 
-app.listen(90);
-console.log('80 is the magic port');
+app.listen(PORT);
+console.log(`${PORT} is the magic port`);
