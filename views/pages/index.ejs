@@ -17,15 +17,15 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-12">
-      <div class="alert alert-primary mt-3" role="alert">
+    <div class="col-sm">
+      <div class="alert alert-success mt-3" role="alert">
         <h5 class="d-inline">IP:</h5> <%= ip %> &nbsp; <h5 class="d-inline">Instance:</h5> <%= instance %>
       </div>
       
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm">
       <table class="table striped">
         <thead>
           <tr>
@@ -46,6 +46,29 @@
           <% }) %>
         </tbody>
       </table>  
+    </div>
+  </div>
+  <div class="row pt-5">
+    <div class="col-sm">
+      <div class="alert alert-info mt-3" role="alert">
+        <h4>Headers</h4>
+        <table class="table striped">
+          <thead>
+            <tr>
+              <th>Header</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody class="body">
+            <% Object.keys(headers).forEach(function(name, index) {  %>
+                <tr>
+                  <td><%= name %></td>
+                  <td><%= headers[name] %></td>
+                </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

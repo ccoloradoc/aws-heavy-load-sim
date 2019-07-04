@@ -66,7 +66,10 @@ var processes = {};
 
 // index page 
 app.get('/', function(req, res) {
+  const { headers } = req;
+    
   res.render('pages/index', {
+    headers: headers,
     ip: ip,
     instance: instance,
     processes: processes
